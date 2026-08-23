@@ -1,0 +1,162 @@
+.capabilities {
+  padding-block: clamp(3.5rem, 9vh, 6.5rem);
+  background: linear-gradient(
+    180deg,
+    var(--color-ink-050),
+    var(--color-ink-000) 68%
+  );
+}
+
+.capabilities-head {
+  display: grid;
+  gap: 1rem;
+  margin-block-end: clamp(2rem, 4vh, 3rem);
+}
+
+.capabilities-lede {
+  color: var(--color-fg-200);
+}
+
+.capabilities-panel {
+  --plate-fill: var(--color-ink-050);
+  display: grid;
+}
+
+.capabilities-tabs {
+  display: grid;
+  border-bottom: 1px solid var(--color-edge);
+}
+
+.capabilities-tab {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.125rem clamp(1.125rem, 2.5vw, 1.75rem);
+  text-align: left;
+  border-bottom: 1px solid color-mix(in oklab, var(--color-edge) 30%, transparent);
+  transition: background-color var(--dur-state) var(--ease-out-quart);
+}
+
+.capabilities-tab:last-child {
+  border-bottom: 0;
+}
+
+.capabilities-tab:hover {
+  background: color-mix(in oklab, var(--color-ink-200) 55%, transparent);
+}
+
+.capabilities-tab[aria-selected='true'] {
+  background: var(--color-ink-200);
+}
+
+.capabilities-tab-index {
+  padding-block-start: 0.25rem;
+  color: var(--color-fg-300);
+  transition: color var(--dur-state) var(--ease-out-quart);
+}
+
+.capabilities-tab[aria-selected='true'] .capabilities-tab-index {
+  color: var(--color-copper);
+}
+
+.capabilities-tab-body {
+  display: grid;
+  gap: 0.3125rem;
+}
+
+.capabilities-tab-name {
+  font-variation-settings: 'wdth' 104, 'wght' 650;
+  font-size: 1.0625rem;
+  letter-spacing: -0.008em;
+  color: var(--color-fg-200);
+  transition: color var(--dur-state) var(--ease-out-quart);
+}
+
+.capabilities-tab[aria-selected='true'] .capabilities-tab-name {
+  color: var(--color-fg-000);
+}
+
+.capabilities-tab-summary {
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--color-fg-300);
+}
+
+.capabilities-detail {
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2.25rem);
+  align-content: start;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.capabilities-detail:focus-visible {
+  outline-offset: -3px;
+}
+
+.capabilities-detail-body {
+  font-size: 1.0625rem;
+  color: var(--color-fg-100);
+}
+
+.capabilities-detail-grid {
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.capabilities-detail-label {
+  margin-block-end: 0.875rem;
+  padding-block-end: 0.5rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--color-edge) 45%, transparent);
+  color: var(--color-fg-300);
+  font-weight: 400;
+}
+
+.capabilities-list {
+  display: grid;
+  gap: 0.6875rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.capabilities-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6875rem;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--color-fg-100);
+}
+
+.capabilities-list svg {
+  inline-size: 12px;
+  block-size: 12px;
+  flex: none;
+  margin-block-start: 0.4375rem;
+  color: var(--color-steel-hi);
+}
+
+.capabilities-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4375rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+@media (min-width: 900px) {
+  .capabilities-panel {
+    grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
+  }
+
+  .capabilities-tabs {
+    border-bottom: 0;
+    border-right: 1px solid var(--color-edge);
+    align-content: start;
+  }
+
+  .capabilities-detail-grid {
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr);
+  }
+}

@@ -1,0 +1,185 @@
+.hero {
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid color-mix(in oklab, var(--color-edge) 75%, transparent);
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset-block-start: -30%;
+  inset-inline-end: -14%;
+  inline-size: min(62rem, 96vw);
+  aspect-ratio: 1;
+  background: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--color-steel) 16%, transparent),
+    transparent 62%
+  );
+  pointer-events: none;
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: center;
+  padding-block: clamp(3rem, 8vh, 6.5rem) clamp(3.5rem, 9vh, 7rem);
+}
+
+.hero-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6875rem;
+  margin-block-end: 1.5rem;
+  color: var(--color-copper);
+}
+
+.hero-kicker-tick {
+  inline-size: 7px;
+  block-size: 7px;
+  background: var(--color-copper);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  animation: var(--animate-tick);
+}
+
+.hero-title {
+  margin-block-end: 1.75rem;
+}
+
+.hero-title-line {
+  display: block;
+}
+
+.hero-title-accent {
+  color: var(--color-copper);
+}
+
+.hero-lede {
+  font-size: clamp(1.0625rem, 1.35vw, 1.1875rem);
+  color: var(--color-fg-100);
+  margin-block-end: 2.25rem;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.875rem;
+  margin-block-end: clamp(2.5rem, 6vh, 3.75rem);
+}
+
+.btn-glyph {
+  inline-size: 16px;
+  block-size: 16px;
+  transition: transform var(--dur-state) var(--ease-out-quart);
+}
+
+.btn:hover .btn-glyph {
+  transform: translateX(3px);
+}
+
+.hero-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  gap: 1px;
+  margin: 0;
+  background: var(--color-edge);
+  border: 1px solid var(--color-edge);
+  max-inline-size: 34rem;
+}
+
+.hero-fact {
+  padding: 0.9375rem 1.0625rem;
+  background: var(--color-ink-000);
+}
+
+.hero-fact dt {
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.09em;
+  color: var(--color-fg-300);
+  margin-block-end: 0.375rem;
+}
+
+.hero-fact dd {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-variation-settings: 'wght' 600;
+  color: var(--color-fg-000);
+}
+
+.hero-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-block-size: clamp(19rem, 46vh, 30rem);
+}
+
+.hero-canvas {
+  inline-size: 100%;
+  block-size: 100%;
+  position: absolute;
+  inset: 0;
+}
+
+.hero-engraved {
+  filter: drop-shadow(0 0 30px color-mix(in oklab, var(--color-steel) 45%, transparent));
+}
+
+.hero-stage-caption {
+  position: absolute;
+  inset-block-end: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding-block-start: 0.625rem;
+  border-top: 1px solid color-mix(in oklab, var(--color-edge) 55%, transparent);
+  inline-size: min(15rem, 80%);
+}
+
+.hero-stage-caption-value {
+  margin-inline-start: auto;
+  font-size: 0.75rem;
+  color: var(--color-copper-hi);
+}
+
+@media (min-width: 980px) {
+  .hero-inner {
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+    gap: clamp(2rem, 4vw, 3.5rem);
+  }
+
+  .hero-stage {
+    min-block-size: clamp(26rem, 62vh, 36rem);
+  }
+}
+
+.hero-die {
+  position: absolute;
+  inset: 0;
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.hero-die-hint {
+  position: absolute;
+  inset-block-end: 2.25rem;
+  inset-inline: 0;
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.14em;
+  text-align: center;
+  color: var(--color-fg-300);
+  opacity: 0;
+  transition: opacity var(--dur-state) var(--ease-out-quart);
+}
+
+.hero-die:hover .hero-die-hint,
+.hero-die:focus-visible .hero-die-hint {
+  opacity: 1;
+  color: var(--color-copper);
+}

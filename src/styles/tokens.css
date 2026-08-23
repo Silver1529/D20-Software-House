@@ -1,0 +1,83 @@
+@theme {
+  --color-ink-000: oklch(0.155 0.009 252);
+  --color-ink-050: oklch(0.185 0.01 252);
+  --color-ink-100: oklch(0.215 0.011 252);
+  --color-ink-200: oklch(0.262 0.013 252);
+  --color-ink-300: oklch(0.335 0.015 252);
+  --color-edge: oklch(0.445 0.016 252);
+  --color-edge-strong: oklch(0.52 0.016 252);
+  --color-fg-000: oklch(0.968 0.004 252);
+  --color-fg-100: oklch(0.858 0.008 252);
+  --color-fg-200: oklch(0.735 0.011 252);
+  --color-fg-300: oklch(0.64 0.013 252);
+  --color-steel: oklch(0.66 0.115 250);
+  --color-steel-hi: oklch(0.8 0.09 250);
+  --color-copper: oklch(0.745 0.13 58);
+  --color-copper-hi: oklch(0.845 0.105 66);
+  --color-cyan: oklch(0.8 0.105 205);
+  --color-danger: oklch(0.72 0.16 25);
+
+  --font-sans: 'Archivo', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'Martian Mono', ui-monospace, 'Cascadia Mono', monospace;
+
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --animate-plate-in: plate-in 560ms var(--ease-out-expo) both;
+  --animate-core-breathe: core-breathe 5.5s ease-in-out infinite;
+  --animate-tick: tick 2.4s var(--ease-out-quart) infinite;
+}
+
+:root {
+  --dur-tap: 110ms;
+  --dur-state: 220ms;
+  --dur-reveal: 560ms;
+  --dur-exit: 165ms;
+
+  --z-base: 0;
+  --z-sticky: 20;
+  --z-overlay: 40;
+  --z-modal: 60;
+  --z-preloader: 100;
+
+  --chamfer: 10px;
+  --chamfer-sm: 6px;
+  --gutter: clamp(1.25rem, 4vw, 4.5rem);
+  --measure: 68ch;
+  --shell: 1280px;
+
+  --grid-pitch: 48px;
+  --grid-ink: color-mix(in oklab, var(--color-edge) 22%, transparent);
+}
+
+@keyframes plate-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes core-breathe {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+@keyframes tick {
+  0%,
+  72%,
+  100% {
+    opacity: 0.35;
+  }
+  78% {
+    opacity: 1;
+  }
+}

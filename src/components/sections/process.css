@@ -1,0 +1,134 @@
+.process {
+  padding-block: clamp(3.5rem, 9vh, 6.5rem);
+  border-block: 1px solid color-mix(in oklab, var(--color-edge) 40%, transparent);
+}
+
+.process-head {
+  display: grid;
+  gap: 1rem;
+  margin-block-end: clamp(2.25rem, 5vh, 3.5rem);
+}
+
+.process-lede {
+  color: var(--color-fg-200);
+}
+
+.process-track {
+  display: grid;
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: none;
+}
+
+.process-step {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1.25rem;
+  padding-block: 1.5rem;
+  border-top: 1px solid color-mix(in oklab, var(--color-edge) 35%, transparent);
+}
+
+.process-step:last-child {
+  border-bottom: 1px solid color-mix(in oklab, var(--color-edge) 35%, transparent);
+}
+
+.process-step-marker {
+  display: grid;
+  justify-items: center;
+  gap: 0.625rem;
+}
+
+.process-step-number {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--color-copper);
+  font-variant-numeric: tabular-nums;
+}
+
+.process-step-rule {
+  inline-size: 1px;
+  block-size: 100%;
+  min-block-size: 1.5rem;
+  background: linear-gradient(
+    to bottom,
+    var(--color-edge),
+    color-mix(in oklab, var(--color-edge) 10%, transparent)
+  );
+}
+
+.process-step-body {
+  display: grid;
+  gap: 0.625rem;
+  max-inline-size: 46rem;
+}
+
+.process-step-duration {
+  color: var(--color-fg-300);
+}
+
+.process-step-name {
+  margin: 0;
+}
+
+.process-step-text {
+  color: var(--color-fg-100);
+}
+
+.process-step-output {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-block-start: 0.3125rem;
+  font-size: 0.875rem;
+  font-variation-settings: 'wght' 600;
+  color: var(--color-steel-hi);
+}
+
+.process-step-output svg {
+  inline-size: 14px;
+  block-size: 14px;
+  flex: none;
+}
+
+@media (min-width: 1000px) {
+  .process-track {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--color-edge);
+    border: 1px solid var(--color-edge);
+  }
+
+  .process-step {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+    padding: 1.5rem 1.375rem 1.75rem;
+    background: var(--color-ink-000);
+    border-top: 0;
+  }
+
+  .process-step:last-child {
+    border-bottom: 0;
+  }
+
+  .process-step-marker {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    justify-items: start;
+    gap: 0.75rem;
+  }
+
+  .process-step-rule {
+    inline-size: 100%;
+    block-size: 1px;
+    min-block-size: 0;
+    background: linear-gradient(
+      to right,
+      var(--color-copper),
+      color-mix(in oklab, var(--color-edge) 20%, transparent)
+    );
+  }
+}
