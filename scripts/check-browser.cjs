@@ -30,6 +30,26 @@ const URL = 'http://localhost:4317/'
         (n) => getComputedStyle(n).opacity === '0',
       ).length
       const overflow = document.documentElement.scrollWidth > window.innerWidth + 1
+      const clipped = Array.from(document.querySelectorAll('body *'))
+        .filter((n) => n.scrollWidth > n.clientWidth + 2 && n.clientWidth > 0)
+        .filter((n) => {
+          const o = getComputedStyle(n).overflowX
+          return o !== 'auto' && o !== 'scroll'
+        })
+        .map((n) => {
+          const edge = n.getBoundingClientRect().right
+          const spill = Array.from(n.querySelectorAll('*')).filter(
+            (d) => d.getBoundingClientRect().right > edge + 2,
+          )
+          return {
+            el: `${n.tagName.toLowerCase()}.${String(n.className).split(' ')[0]}`,
+            box: `${n.clientWidth}<${n.scrollWidth}`,
+            contentClipped: spill.length > 0,
+            worst: spill.length
+              ? `${spill[0].tagName.toLowerCase()}.${String(spill[0].className).split(' ')[0]}`
+              : 'decorative bleed only',
+          }
+        })
       const small = Array.from(
         document.querySelectorAll('a, button, input, select, textarea, [role="tab"]'),
       )
@@ -41,6 +61,7 @@ const URL = 'http://localhost:4317/'
       return {
         stillHidden: hidden,
         horizontalOverflow: overflow,
+        clippedOverflow: [...new Set(clipped)],
         scrollWidth: document.documentElement.scrollWidth,
         viewport: window.innerWidth,
         smallTargets: [...new Set(small)],
@@ -50,7 +71,8 @@ const URL = 'http://localhost:4317/'
           main: document.querySelectorAll('main').length,
           footer: document.querySelectorAll('footer').length,
         },
-        imgNoAlt: Array.from(document.images).filter((i) => !i.alt).length,
+        imgMissingAltAttr: Array.from(document.images).filter((i) => !i.hasAttribute('alt')).length,
+        imgDecorative: Array.from(document.images).filter((i) => i.getAttribute('alt') === '').length,
       }
     })
     console.log(`\n== ${name} (${width}x${height}) ==`)
@@ -58,6 +80,7 @@ const URL = 'http://localhost:4317/'
     await p.close()
   }
 
+  await shot('xs', 320, 760)
   await shot('desk', 1440, 900)
   await shot('tab', 834, 1100)
   await shot('mob', 375, 820)
