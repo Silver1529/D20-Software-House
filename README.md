@@ -16,19 +16,19 @@ npm run preview    # serve o dist
 npm run typecheck
 ```
 
-Nada além de `npm install`. Sem variável de ambiente, sem backend, sem serviço
-externo — o site é estático e sai pronto para Vercel, Netlify ou qualquer host de
-arquivos (`dist/`).
+O site em si é estático. O **formulário de contato** precisa de variáveis de
+ambiente e de uma serverless function — veja [E-mail do formulário](#e-mail-do-formulário).
 
 ## Bibliotecas
 
-Três dependências de runtime:
+Quatro dependências de runtime:
 
 | Pacote | Versão | Para quê |
 |---|---|---|
 | `react` / `react-dom` | 19 | UI |
 | `three` | 0.180 | o D20 em WebGL (icosaedro real, 20 faces numeradas) |
 | `motion` | 12 | o fade-out do overlay do pré-loader (é o Framer Motion, nome novo) |
+| `nodemailer` | 9 | envio dos e-mails do formulário (só no servidor, não vai no bundle) |
 
 Dev: `vite`, `@vitejs/plugin-react`, `typescript`, `tailwindcss` +
 `@tailwindcss/vite`, `@types/*`, `vite-node` (roda os verificadores de
@@ -181,6 +181,84 @@ interface é uma superfície usinada e fosca — são linguagens visuais diferen
 Ela está aplicada como você pediu; se um dia quiser um símbolo vetorial que
 converse com o resto, é uma boa próxima tarefa.
 
+## E-mail do formulário
+
+O formulário envia **dois** e-mails por contato, via Nodemailer sobre o SMTP do
+Gmail:
+
+1. **Aviso interno** para `MAIL_TO` com os dados do lead. O `replyTo` aponta para
+   o e-mail de quem preencheu, então apertar Responder já fala com a pessoa.
+2. **Confirmação para o cliente**, com cópia do que ele enviou e o que acontece
+   agora. O `replyTo` aponta de volta para `MAIL_TO`.
+
+### Como isso roda
+
+O site é estático, e **Nodemailer é Node.js — não roda no navegador**. O envio
+mora em `api/contact.ts`, uma serverless function da Vercel. Em
+desenvolvimento, um plugin do Vite (`contactApi` no `vite.config.ts`) monta o
+mesmo handler em `/api/contact`, então `npm run dev` testa o fluxo completo sem
+precisar do `vercel dev`.
+
+### Configuração
+
+Copie `.env.example` para `.env` e preencha:
+
+```bash
+cp .env.example .env
+```
+
+| Variável | O que é |
+|---|---|
+| `MAIL_HOST` / `MAIL_PORT` / `MAIL_SECURE` | `smtp.gmail.com`, `465`, `true` |
+| `MAIL_USER` | a conta Gmail que envia |
+| `MAIL_PASS` | **senha de app** de 16 caracteres, não a senha da conta |
+| `MAIL_FROM` | remetente exibido, ex. `D20 Software House <voce@gmail.com>` |
+| `MAIL_TO` | onde cai o aviso de novo contato |
+| `SITE_URL` | usado nos links e no logo dos e-mails |
+
+A senha de app se cria em **myaccount.google.com/apppasswords** (exige 2FA
+ligado na conta). O Google mostra ela em quatro blocos de quatro; os espaços são
+só visuais — o código remove qualquer espaço antes de usar.
+
+### Em produção você precisa cadastrar as variáveis na Vercel
+
+`.env` está no `.gitignore` e **não vai para o deploy**. Sem cadastrar as
+variáveis no painel, o formulário responde 500 em produção:
+
+Vercel → seu projeto → **Settings → Environment Variables** → adicione as sete
+(Production, Preview e Development) → **Redeploy**.
+
+### O que o endpoint faz
+
+- Aceita só `POST`; qualquer outro método recebe 405.
+- **Revalida tudo no servidor** com as mesmas regras do front. Nunca confia no
+  cliente: um 422 volta com erro por campo e o front realoca o foco.
+- **Honeypot**: um campo `company` oculto e fora da ordem de tabulação. Se vier
+  preenchido, responde 200 sem enviar nada — o bot acha que funcionou.
+- **Rate limit** de 4 por minuto por IP (429). É por instância da função, então
+  não é uma barreira forte; serve contra abuso trivial.
+- **Escapa todo o input** antes de montar o HTML do e-mail. Sem isso o corpo do
+  e-mail seria um vetor de injeção.
+- Se o aviso interno sai mas a confirmação falha, responde `200` com
+  `receipt: false` — o lead não se perde por causa do e-mail secundário.
+
+### Por que os e-mails são claros e não escuros
+
+O site é escuro, mas e-mail HTML é outro terreno: o modo escuro do Gmail inverte
+cores, o Outlook ignora `background` em vários elementos, e não existe grid,
+variável CSS nem `oklch`. Um e-mail escuro quebra de formas difíceis de prever.
+Então os templates usam o padrão que funciona em todo cliente: **corpo claro com
+faixa de marca escura no topo**, layout em tabela, estilos inline e cores em hex.
+Cada e-mail também vai com alternativa em texto puro.
+
+Os templates ficam em `api/_lib/templates/`. Para revisar visualmente, altere um
+template e rode:
+
+```bash
+npm run dev
+npm run check:contact
+```
+
 ## Estrutura
 
 ```
@@ -204,23 +282,56 @@ src/
 
 ## Conteúdo pendente
 
-`src/content/site.ts` é a única fonte de texto e dados. O que a empresa ainda não
-forneceu está marcado `TODO` e **renderiza como ausência visível** — nunca como
-número inventado. O mockup original trazia "120+ projetos", "9 anos de
-engenharia", três cases fictícios e um e-mail que não existe; nada disso foi
-mantido.
+`src/content/site.ts` é a única fonte de texto e dados. Nada nesta página é
+inventado: não há cliente fictício, logo emprestado nem número que não tenha sido
+medido.
 
-Para publicar de verdade, preencha:
+### A seção Projetos tem dois estados
 
-- `company.email`, `company.whatsapp`, `company.city`, `company.cnpj`
-- os três itens de `cases` (cliente, título, problema, métricas)
-- `cases[].image` — ao apontar um caminho de imagem, o esquema técnico em SVG é
-  substituído automaticamente pelo screenshot real
+`cases` está **vazio** hoje, e a seção assume o estado honesto: diz que o estúdio
+é novo, lista o que cada case vai trazer quando existir, e apresenta este próprio
+site como o material avaliável — com números que foram medidos, não estimados.
 
-O formulário de contato está completo no front (validação, erro, loading,
-sucesso, foco no primeiro campo inválido, `role="alert"`), mas o `onSubmit` ainda
-não aponta para lugar nenhum — a própria interface diz isso. Ligue-o ao seu
-endpoint em `src/components/sections/Contact.tsx`.
+Assim que você adicionar o primeiro objeto ao array `cases`, a seção troca
+sozinha para a grade de cases. Não precisa mexer no componente.
+
+```ts
+export const cases: CaseStudy[] = [
+  {
+    id: 'case-01',
+    client: 'Nome do cliente',
+    title: 'O que foi construído',
+    kind: 'Sistema sob medida',
+    problem: 'Onde a operação travava, na linguagem da empresa',
+    outcome: 'O que mudou depois',
+    metrics: [{ label: 'tempo de fechamento', value: '-68%' }],
+    stack: ['TypeScript', 'Node.js', 'PostgreSQL'],
+    image: '/cases/case-01.webp',
+    imageAlt: 'Painel de fechamento mensal do sistema',
+    href: 'https://exemplo.com.br',
+  },
+]
+```
+
+Campos que você não tiver ainda: deixe `TODO` e eles renderizam como **ausência
+visível** (barra hachurada em mono), não como texto falso. Ao apontar `image`
+para um caminho real, o esquema técnico em SVG é substituído pelo screenshot
+automaticamente.
+
+### Os números da seção Projetos
+
+As linhas de "avalie este site" vivem em `work.evidence.rows`. **Se você mexer no
+projeto, confira se elas continuam verdadeiras** — o valor da seção é justamente
+serem verificáveis. `npm run build` dá o peso, `npm run check:browser` dá as
+larguras e o console, `npm run verify` dá o número de checagens.
+
+### Dados da empresa
+
+Ainda faltam em `company`: `email`, `whatsapp`, `city`, `cnpj`. Todos aparecem
+como ausência visível no rodapé e na seção de contato até serem preenchidos.
+
+O formulário de contato está ligado e enviando — veja
+[E-mail do formulário](#e-mail-do-formulário).
 
 ## Verificação
 
@@ -229,6 +340,7 @@ npm run verify          # 40 checagens de geometria e física, sem navegador
 npm run check:browser   # 3 viewports: overflow, alvos de toque, landmarks, alt
 npm run check:states    # teclado, tablist, validação, reduced-motion, skip link
 npm run check:audio     # timing dos sons, janela de 1,5 s, mudo, autoplay bloqueado
+npm run check:contact   # formulário: honeypot, payload, 422, 429, 502, rede caída
 npm run icons           # regera favicons e marcas a partir da logo
 ```
 

@@ -142,47 +142,70 @@ export type CaseStudy = {
   href: Pending<string>
 }
 
-export const cases: CaseStudy[] = [
-  {
-    id: 'case-01',
-    client: TODO,
-    title: TODO,
-    kind: 'Sistema sob medida',
-    problem: TODO,
-    outcome: TODO,
-    metrics: TODO,
-    stack: ['TypeScript', 'Node.js', 'PostgreSQL'],
-    image: TODO,
-    imageAlt: TODO,
-    href: TODO,
+export const cases: CaseStudy[] = []
+
+export const work = {
+  heading: 'Projetos',
+  lede:
+    'Somos um estúdio novo. Ainda não temos case entregue para mostrar, e não vamos preencher esta página com cliente fictício, logo emprestado ou número inventado.',
+  empty: {
+    label: 'cases publicados: 0',
+    heading: 'O que vai aparecer aqui',
+    body:
+      'Assim que o primeiro projeto entrar em produção, ele vira um case nesta página — com autorização do cliente e sem maquiagem. Cada um vai trazer exatamente isto:',
+    promise: [
+      'O problema que a empresa tinha, na linguagem dela',
+      'O que construímos e por que decidimos daquele jeito',
+      'A stack e a arquitetura, sem esconder o que deu trabalho',
+      'Um resultado medido — não adjetivo, número',
+      'O contato do cliente, para você pedir a referência direto',
+    ],
   },
-  {
-    id: 'case-02',
-    client: TODO,
-    title: TODO,
-    kind: 'Aplicativo',
-    problem: TODO,
-    outcome: TODO,
-    metrics: TODO,
-    stack: ['React Native', 'Expo'],
-    image: TODO,
-    imageAlt: TODO,
-    href: TODO,
+  evidence: {
+    label: 'material disponível hoje',
+    heading: 'Enquanto isso, avalie este site',
+    body:
+      'Ele é nosso: pesquisa, arquitetura, código, o 3D do dado, a acessibilidade e o deploy. Se ele for bem feito, é a melhor amostra que temos para oferecer. Tudo abaixo foi medido, não estimado.',
+    rows: [
+      {
+        label: 'Primeiro carregamento',
+        value: '251 KB',
+        note: 'comprimidos, dos quais 122 KB são o motor 3D em chunk separado',
+      },
+      {
+        label: 'Acessibilidade',
+        value: 'WCAG 2.2 AA',
+        note: 'contraste calculado por script, alvos de toque de 44 px, navegação completa por teclado',
+      },
+      {
+        label: 'Responsividade',
+        value: '320 a 1440 px',
+        note: 'quatro larguras auditadas, nenhum conteúdo cortado ou fora da tela',
+      },
+      {
+        label: 'Animação do dado',
+        value: '40 verificações',
+        note: 'a face 20 cai de frente por cálculo de quaternion, com erro de 4,4e-16',
+      },
+      {
+        label: 'Degradação',
+        value: 'sem WebGL, sem som',
+        note: 'funciona com movimento reduzido, sem placa 3D e com áudio bloqueado',
+      },
+      {
+        label: 'Console em produção',
+        value: 'zero erros',
+        note: 'verificado nas quatro larguras, incluindo requisições de rede',
+      },
+    ],
   },
-  {
-    id: 'case-03',
-    client: TODO,
-    title: TODO,
-    kind: 'WordPress avançado',
-    problem: TODO,
-    outcome: TODO,
-    metrics: TODO,
-    stack: ['PHP', 'WordPress'],
-    image: TODO,
-    imageAlt: TODO,
-    href: TODO,
+  invite: {
+    text: 'Quer ser o primeiro case?',
+    body:
+      'Projeto inaugural tem preço de projeto inaugural, e você entra na conversa sabendo disso. Em troca pedimos autorização para publicar o resultado.',
+    action: { label: 'Falar sobre isso', href: '#contato' },
   },
-]
+}
 
 export const principles = [
   {

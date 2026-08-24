@@ -12,6 +12,11 @@ const newPage = async (browser, opts = {}) => {
   return p
 }
 
+const stubContact = (p) =>
+  p.route('**/api/contact', (route) =>
+    route.fulfill({ status: 200, json: { ok: true, receipt: true } }),
+  )
+
 const skipRoll = (p) =>
   p.addInitScript(() => {
     try {
@@ -119,6 +124,7 @@ const skipRoll = (p) =>
   {
     const p = await newPage(browser)
     await skipRoll(p)
+    await stubContact(p)
     await p.goto(URL, { waitUntil: 'networkidle' })
     await p.fill('#email', 'nao-e-email')
     await p.locator('#name').focus()

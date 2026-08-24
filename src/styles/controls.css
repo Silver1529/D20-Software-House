@@ -90,8 +90,7 @@
   gap: 0.5rem;
   color: var(--color-steel-hi);
   font-variation-settings: 'wght' 600;
-  min-height: 44px;
-  padding-block: 0.625rem;
+  padding-block: 0.125rem;
   border-bottom: 1px solid color-mix(in oklab, var(--color-steel) 45%, transparent);
   transition:
     color var(--dur-state) var(--ease-out-quart),

@@ -1,4 +1,4 @@
-import { cases, isPending, type CaseStudy } from '../../content/site'
+import { cases, isPending, work, type CaseStudy } from '../../content/site'
 import { CaseSchematic } from '../ui/CaseSchematic'
 import { Pending, PendingBlock } from '../ui/Pending'
 import './work.css'
@@ -80,51 +80,96 @@ function CaseCard({ item, featured }: { item: CaseStudy; featured: boolean }) {
   )
 }
 
+function EmptyState() {
+  return (
+    <div className="work-empty">
+      <div className="work-column">
+        <section className="work-panel plate" aria-labelledby="work-promise-title">
+          <p className="work-panel-label tag">{work.empty.label}</p>
+          <h3 className="u-sub work-panel-title" id="work-promise-title">
+            {work.empty.heading}
+          </h3>
+          <p className="work-panel-body">{work.empty.body}</p>
+
+          <ul className="work-promise">
+            {work.empty.promise.map((entry) => (
+              <li key={entry}>
+                <svg viewBox="0 0 12 12" aria-hidden="true">
+                  <path
+                    d="M2 6.4 4.6 9 10 3.2"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <span>{entry}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <p className="work-invite">
+          <strong>{work.invite.text}</strong> {work.invite.body}{' '}
+          <a className="link-inline" href={work.invite.action.href}>
+            {work.invite.action.label}
+          </a>
+        </p>
+      </div>
+
+      <section
+        className="work-panel work-panel-evidence plate"
+        aria-labelledby="work-evidence-title"
+      >
+        <p className="work-panel-label tag tag-steel">{work.evidence.label}</p>
+        <h3 className="u-sub work-panel-title" id="work-evidence-title">
+          {work.evidence.heading}
+        </h3>
+        <p className="work-panel-body">{work.evidence.body}</p>
+
+        <dl className="work-spec">
+          {work.evidence.rows.map((row) => (
+            <div className="work-spec-row" key={row.label}>
+              <dt className="work-spec-label u-data">{row.label}</dt>
+              <dd className="work-spec-value">{row.value}</dd>
+              <dd className="work-spec-note">{row.note}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    </div>
+  )
+}
+
 export function Work() {
-  const pendingCount = cases.filter((item) => isPending(item.title)).length
+  const hasCases = cases.length > 0
 
   return (
     <section className="work" id="projetos" aria-labelledby="work-title">
       <div className="u-shell">
         <div className="work-head">
-          <div>
-            <h2 className="u-head" id="work-title">
-              Projetos
-            </h2>
-            <p className="work-lede u-measure">
-              A maior parte do que construímos roda dentro de operações fechadas.
-              Estamos liberando os cases com autorização de cada cliente — nada de
-              número inventado enquanto isso.
-            </p>
+          <h2 className="u-head" id="work-title">
+            {work.heading}
+          </h2>
+          <p className="work-lede u-measure">{work.lede}</p>
+        </div>
+
+        {hasCases ? (
+          <div className="work-grid">
+            {cases.map((item, index) => (
+              <div
+                key={item.id}
+                className="reveal work-cell"
+                data-featured={index === 0}
+                style={{ '--i': index } as React.CSSProperties}
+              >
+                <CaseCard item={item} featured={index === 0} />
+              </div>
+            ))}
           </div>
-
-          {pendingCount > 0 && (
-            <p className="work-status u-data" role="status">
-              <span className="work-status-dot" aria-hidden="true" />
-              {pendingCount} de {cases.length} cases em liberação
-            </p>
-          )}
-        </div>
-
-        <div className="work-grid">
-          {cases.map((item, index) => (
-            <div
-              key={item.id}
-              className="reveal work-cell"
-              data-featured={index === 0}
-              style={{ '--i': index } as React.CSSProperties}
-            >
-              <CaseCard item={item} featured={index === 0} />
-            </div>
-          ))}
-        </div>
-
-        <p className="work-foot">
-          Precisa falar com um cliente nosso antes de decidir?{' '}
-          <a className="link-inline" href="#contato">
-            Pedimos a referência para você
-          </a>
-        </p>
+        ) : (
+          <EmptyState />
+        )}
       </div>
     </section>
   )

@@ -60,6 +60,7 @@ export function Contact() {
   const [errors, setErrors] = useState<Errors>({})
   const [touched, setTouched] = useState<Partial<Record<FieldName, boolean>>>({})
   const [status, setStatus] = useState<Status>('idle')
+  const [failure, setFailure] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
 
   const onBlur = (event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -97,14 +98,66 @@ export function Contact() {
       return
     }
 
+    const focusFirst = (fields: Errors) => {
+      const first = names.find((entry) => fields[entry])
+      if (!first) return
+      const node = form.elements.namedItem(first)
+      if (node instanceof HTMLElement) node.focus()
+    }
+
     setStatus('sending')
+    setFailure(null)
+
     try {
-      await new Promise((resolve) => window.setTimeout(resolve, 900))
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: String(data.get('name') ?? ''),
+          email: String(data.get('email') ?? ''),
+          kind: String(data.get('kind') ?? ''),
+          budget: String(data.get('budget') ?? ''),
+          message: String(data.get('message') ?? ''),
+          company: String(data.get('company') ?? ''),
+        }),
+      })
+
+      if (response.status === 422) {
+        const body = (await response.json().catch(() => null)) as
+          | { fields?: Errors }
+          | null
+        const fields = body?.fields ?? {}
+        setErrors(fields)
+        setStatus('idle')
+        focusFirst(fields)
+        return
+      }
+
+      if (response.status === 429) {
+        setStatus('failed')
+        setFailure(
+          'Recebemos várias tentativas em pouco tempo. Espere um minuto e envie de novo.',
+        )
+        return
+      }
+
+      if (!response.ok) {
+        setStatus('failed')
+        setFailure(
+          'O envio falhou no nosso servidor. Tente de novo em alguns minutos ou fale com a gente pelo WhatsApp.',
+        )
+        return
+      }
+
       setStatus('sent')
       form.reset()
       setTouched({})
+      setErrors({})
     } catch {
       setStatus('failed')
+      setFailure(
+        'Não conseguimos falar com o servidor. Verifique sua conexão e tente novamente.',
+      )
     }
   }
 
@@ -165,6 +218,17 @@ export function Contact() {
           noValidate
           onSubmit={onSubmit}
         >
+          <div className="contact-trap" aria-hidden="true">
+            <label htmlFor="company">Empresa</label>
+            <input
+              id="company"
+              name="company"
+              type="text"
+              tabIndex={-1}
+              autoComplete="off"
+            />
+          </div>
+
           <p className="contact-required u-data">Todos os campos são obrigatórios</p>
 
           <div className="contact-form-grid">
@@ -312,9 +376,8 @@ export function Contact() {
 
           <p className="contact-feedback" role="status" aria-live="polite" data-state={status}>
             {status === 'sent' &&
-              'Recebido. Vamos ler e responder no e-mail informado em até um dia útil.'}
-            {status === 'failed' &&
-              'O envio falhou. Tente novamente ou fale com a gente pelo WhatsApp.'}
+              'Recebido. Acabamos de enviar uma confirmação para o seu e-mail — respondemos em até um dia útil.'}
+            {status === 'failed' && failure}
           </p>
 
         </form>

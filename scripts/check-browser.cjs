@@ -30,24 +30,41 @@ const URL = 'http://localhost:4317/'
         (n) => getComputedStyle(n).opacity === '0',
       ).length
       const overflow = document.documentElement.scrollWidth > window.innerWidth + 1
+      const isVisuallyHidden = (node) => {
+        let el = node
+        while (el && el !== document.body) {
+          const cs = getComputedStyle(el)
+          const box = el.getBoundingClientRect()
+          if (cs.clipPath.startsWith('inset(50%')) return true
+          if (box.width * box.height <= 4) return true
+          el = el.parentElement
+        }
+        return false
+      }
       const clipped = Array.from(document.querySelectorAll('body *'))
         .filter((n) => n.scrollWidth > n.clientWidth + 2 && n.clientWidth > 0)
         .filter((n) => {
           const o = getComputedStyle(n).overflowX
           return o !== 'auto' && o !== 'scroll'
         })
+        .filter((n) => !isVisuallyHidden(n))
         .map((n) => {
           const edge = n.getBoundingClientRect().right
           const spill = Array.from(n.querySelectorAll('*')).filter(
             (d) => d.getBoundingClientRect().right > edge + 2,
           )
+          const ownText = Array.from(n.childNodes).some(
+            (c) => c.nodeType === 3 && c.textContent.trim().length > 0,
+          )
           return {
             el: `${n.tagName.toLowerCase()}.${String(n.className).split(' ')[0]}`,
             box: `${n.clientWidth}<${n.scrollWidth}`,
-            contentClipped: spill.length > 0,
+            contentClipped: spill.length > 0 || ownText,
             worst: spill.length
               ? `${spill[0].tagName.toLowerCase()}.${String(spill[0].className).split(' ')[0]}`
-              : 'decorative bleed only',
+              : ownText
+                ? 'own text is cut off'
+                : 'decorative bleed only',
           }
         })
       const small = Array.from(
@@ -55,7 +72,22 @@ const URL = 'http://localhost:4317/'
       )
         .filter((n) => {
           const r = n.getBoundingClientRect()
-          return r.width > 0 && r.height > 0 && (r.height < 44 || r.width < 24)
+          if (r.width === 0 || r.height === 0) return false
+          if (r.height >= 44 && r.width >= 24) return false
+          const parent = n.parentElement
+          const own = (n.textContent || '').trim().length
+          const around = (parent?.textContent || '').trim().length
+          const inSentence = Boolean(parent) && around > own + 12
+          if (inSentence) return false
+          let probe = n
+          while (probe && probe !== document.body) {
+            const cs = getComputedStyle(probe)
+            const box = probe.getBoundingClientRect()
+            if (cs.clipPath.startsWith('inset(50%')) return false
+            if (box.width * box.height <= 4) return false
+            probe = probe.parentElement
+          }
+          return true
         })
         .map((n) => `${n.tagName.toLowerCase()}.${(n.className || '').toString().split(' ')[0]} ${Math.round(n.getBoundingClientRect().height)}px`)
       return {
