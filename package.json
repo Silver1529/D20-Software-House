@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
-    "verify": "vite-node scripts/verify-geometry.mjs && vite-node scripts/verify-edges.mjs && vite-node scripts/verify-timeline.mjs",
+    "verify": "vite-node scripts/verify-geometry.mjs && vite-node scripts/verify-edges.mjs && vite-node scripts/verify-timeline.mjs && vite-node scripts/verify-contact-options.mjs",
     "check:browser": "node scripts/check-browser.cjs",
     "check:states": "node scripts/check-states.cjs",
     "check:audio": "node scripts/check-audio.cjs",

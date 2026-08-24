@@ -1,3 +1,5 @@
+import { BUDGET_RANGES, PROJECT_KINDS } from '../../shared/contact-options'
+
 export const TODO = '__TODO__' as const
 
 export type Pending<T> = T | typeof TODO
@@ -229,20 +231,8 @@ export const contact = {
   heading: 'Conte o problema, não a solução',
   lede:
     'Descreva onde a operação trava hoje. Respondemos em até um dia útil com uma primeira leitura técnica — sem compromisso e sem proposta genérica.',
-  budgets: [
-    'Ainda não sei',
-    'Até R$ 2.500,00',
-    'R$ 2.500,00 a R$ 5.000,00',
-    'R$ 5.000,00 a R$ 10.000,00',
-    'Acima de R$ 10.000,00',
-  ],
-  kinds: [
-    'Sistema sob medida',
-    'Aplicativo',
-    'WordPress avançado',
-    'Manutenção de sistema existente',
-    'Ainda não sei',
-  ],
+  budgets: BUDGET_RANGES,
+  kinds: PROJECT_KINDS,
 }
 
 export const nav = [

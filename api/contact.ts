@@ -88,17 +88,21 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   const { transporter, env } = mailer
 
+  const person = { name: lead.name, address: lead.email }
   const notice = templateLead({ lead, receivedAt, siteUrl: env.siteUrl })
 
   try {
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: env.from,
       to: env.to,
-      replyTo: `${lead.name} <${lead.email}>`,
+      replyTo: person,
       subject: notice.subject,
       text: notice.text,
       html: notice.html,
     })
+    console.log(
+      `contato: aviso interno aceito=${JSON.stringify(info.accepted)} recusado=${JSON.stringify(info.rejected)} id=${info.messageId}`,
+    )
   } catch (error) {
     console.error('contato: falha ao enviar o aviso interno', error)
     res.status(502).json({ error: 'mail_failed' })
@@ -108,14 +112,21 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   const receipt = templateReceipt({ lead, replyTo: env.to, siteUrl: env.siteUrl })
 
   try {
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: env.from,
-      to: `${lead.name} <${lead.email}>`,
+      to: person,
       replyTo: env.to,
       subject: receipt.subject,
       text: receipt.text,
       html: receipt.html,
     })
+    console.log(
+      `contato: confirmação ao cliente aceito=${JSON.stringify(info.accepted)} recusado=${JSON.stringify(info.rejected)} id=${info.messageId}`,
+    )
+    if (info.accepted.length === 0) {
+      res.status(200).json({ ok: true, receipt: false })
+      return
+    }
   } catch (error) {
     console.error('contato: aviso interno enviado, confirmação ao cliente falhou', error)
     res.status(200).json({ ok: true, receipt: false })

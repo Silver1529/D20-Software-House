@@ -1,3 +1,5 @@
+import { isBudgetRange, isProjectKind } from '../../shared/contact-options.js'
+
 export type Lead = {
   name: string
   email: string
@@ -19,22 +21,6 @@ const LIMITS = {
   budget: 80,
   message: 4000,
 } as const
-
-const KINDS = [
-  'Sistema sob medida',
-  'Aplicativo',
-  'WordPress avançado',
-  'Manutenção de sistema existente',
-  'Ainda não sei',
-]
-
-const BUDGETS = [
-  'Ainda não sei',
-  'Até R$ 30 mil',
-  'R$ 30 mil a R$ 80 mil',
-  'R$ 80 mil a R$ 200 mil',
-  'Acima de R$ 200 mil',
-]
 
 function text(value: unknown): string {
   return typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() : ''
@@ -58,8 +44,8 @@ export function validateLead(payload: unknown): ValidationResult {
   if (name.length < 2) errors.name = 'Informe seu nome para sabermos com quem falamos.'
   if (!email) errors.email = 'Precisamos de um e-mail para responder.'
   else if (!EMAIL_SHAPE.test(email)) errors.email = 'Confira o e-mail: falta o @ ou o domínio.'
-  if (!kind || !KINDS.includes(kind)) errors.kind = 'Escolha uma opção da lista.'
-  if (!budget || !BUDGETS.includes(budget)) errors.budget = 'Escolha uma opção da lista.'
+  if (!kind || !isProjectKind(kind)) errors.kind = 'Escolha uma opção da lista.'
+  if (!budget || !isBudgetRange(budget)) errors.budget = 'Escolha uma opção da lista.'
   if (message.length < 20) errors.message = 'Conte um pouco mais: pelo menos 20 caracteres.'
 
   if (Object.keys(errors).length > 0) return { ok: false, errors }
