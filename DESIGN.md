@@ -114,16 +114,22 @@ moment (the D20 roll) and nothing else competes with it.
 
 A real icosahedron in WebGL, 20 numbered faces, landing exactly on 20.
 
-**Sequence** (2.62s total, skippable, once per session):
+**Sequence** (2.85s total, skippable, once per session):
 
 | Phase | Window | What happens |
 |---|---|---|
-| fall | 0-820ms | free fall from `y=7.2` under `g=26`, tumble on a tilted axis at 5.6 rad/s |
-| impact | 820ms | squash to `1.20/0.78`, shockwave ring, 24-spark burst, screen flash |
-| bounce | 820-1780ms | two damped hops, restitution `0.42` then `0.15` |
-| settle | 1780-2240ms | slerp to the face-20 quaternion, easing `outExpo`, spin decays into the lock |
-| lock | 2240-2620ms | face-20 emissive ramps, edge lines brighten, halo blooms |
-| exit | 2380-2620ms | die scales to 1.9 and dissolves, scrim crossfades out |
+| fall | 0-880ms | free fall from `y=4.65` under `g=12`; 1.4 turns on three non-commensurate axes (spin, tumble ×0.618, roll ×0.43) so the die reads as tumbling in 3D, not wobbling on one axis |
+| impact | 880ms | squash to `1.20/0.78`, horizontal flare, 26-spark burst, screen flash |
+| bounce | 880-1848ms | two damped hops, restitution `0.40` then `0.15` |
+| settle | 880-1848ms | slerp to the face-20 quaternion, easing `outExpo`; angular velocity decays as an integral so the spin never reverses |
+| lock | 1848-2268ms | face-20 emissive ramps, edge lines brighten, halo blooms |
+| hold | 2268-2488ms | the 20 stays readable |
+| exit | 2488-2848ms | die scales to 1.9 and dissolves, scrim crossfades out |
+
+Gravity is deliberately lower than the real 9.8 m/s² scaled to the scene: it
+is what buys an 880ms fall from a height that is still inside the frame at
+release. Faster gravity meant a 600ms fall that nobody could watch; a higher
+drop meant a die that entered the frame late.
 
 **The landing math.** For face *i* with normal `n_i`, the orientation that puts
 that face flat against the camera is `q_i = quaternionFromUnitVectors(n_i, +Z)`.
@@ -144,6 +150,13 @@ supplied by the business is marked `TODO` there **and rendered as a visible
 absence** — never as an invented number. Case-study media slots render a
 per-project engraved SVG schematic until a real screenshot path is provided;
 dropping a path into the content file replaces the schematic automatically.
+
+Client cases carry only what is verifiable on the published site: segment,
+what the site does, features you can click, and the stack that is visible in
+the page source. No metrics unless measured (`metrics: TODO` hides the row).
+Thumbnails are 1280×800 WebP captures of each site's first screen, stored in
+`public/cases/`. The whole card is one link to the live site, opened in a new
+tab, so the visitor judges the real thing rather than the print.
 
 ## Code conventions
 

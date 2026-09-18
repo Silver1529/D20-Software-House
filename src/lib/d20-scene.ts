@@ -43,6 +43,7 @@ const SPARK_COUNT = 26
 const SPARK_GRAVITY = 12
 const SPIN_AXIS = new Vector3(0.34, 1, 0.16).normalize()
 const TUMBLE_AXIS = new Vector3(1, 0.18, -0.52).normalize()
+const ROLL_AXIS = new Vector3(-0.22, 0.3, 1).normalize()
 
 export type D20Stage = {
   model: D20Model
@@ -271,6 +272,7 @@ export function createD20Stage(
   const target = orientationForValue(model, options.landOn ?? 20)
   const spinQuat = new Quaternion()
   const tumbleQuat = new Quaternion()
+  const rollQuat = new Quaternion()
   const composed = new Quaternion()
 
   let baseZ = CAMERA_Z
@@ -292,7 +294,8 @@ export function createD20Stage(
   const applyRoll = (frame: D20Frame) => {
     spinQuat.setFromAxisAngle(SPIN_AXIS, frame.spinAngle)
     tumbleQuat.setFromAxisAngle(TUMBLE_AXIS, frame.tumbleAngle)
-    composed.copy(spinQuat).multiply(tumbleQuat)
+    rollQuat.setFromAxisAngle(ROLL_AXIS, frame.rollAngle)
+    composed.copy(spinQuat).multiply(tumbleQuat).multiply(rollQuat)
     dieGroup.quaternion.slerpQuaternions(composed, target, frame.settle)
 
     camera.position.z = baseZ * (1 + 0.2 * (1 - frame.settle) - frame.exit * 0.1)

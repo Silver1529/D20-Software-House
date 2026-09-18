@@ -132,11 +132,11 @@ export const process: ProcessStep[] = [
 
 export type CaseStudy = {
   id: string
-  client: Pending<string>
-  title: Pending<string>
+  name: string
   kind: string
-  problem: Pending<string>
-  outcome: Pending<string>
+  segment: string
+  summary: string
+  features: string[]
   metrics: Pending<{ label: string; value: string }[]>
   stack: string[]
   image: Pending<string>
@@ -144,12 +144,76 @@ export type CaseStudy = {
   href: Pending<string>
 }
 
-export const cases: CaseStudy[] = []
+export const cases: CaseStudy[] = [
+  {
+    id: 'foco-arte',
+    name: 'Foco Arte',
+    kind: 'Site institucional',
+    segment: 'Gesso e drywall · São Paulo',
+    summary:
+      'Site de uma empresa de forros, sancas e divisórias em atividade desde 2014. Apresenta os oito serviços, o sistema de trabalho em seis etapas, a galeria da obra entregue para a Shopee e leva o orçamento direto ao WhatsApp da equipe.',
+    features: [
+      'Abertura animada com a marca antes do conteúdo',
+      'Formulário que monta o pedido e envia pelo WhatsApp',
+      'Galeria de obra com doze fotos legendadas',
+      'Depoimentos, indicadores da empresa e três canais de contato',
+    ],
+    metrics: TODO,
+    stack: ['Next.js', 'React', 'Tailwind CSS', 'Vercel'],
+    image: '/cases/foco-arte.webp',
+    imageAlt:
+      'Página inicial do site Foco Arte: título "Soluções em gesso & drywall" em letras metálicas sobre fundo grafite, ao lado da logo da empresa.',
+    href: 'https://foco-arte.vercel.app/',
+  },
+  {
+    id: 'iacontabil',
+    name: 'Iacontábil',
+    kind: 'Site institucional',
+    segment: 'Contabilidade digital · São Paulo',
+    summary:
+      'Site multipágina de um escritório de contabilidade digital fundado em 2017. Organiza quatro frentes de serviço, apresenta o sócio fundador, aponta para o aplicativo do cliente nas lojas e recebe pedidos de orçamento.',
+    features: [
+      'Abertura com mockup de celular navegando pelo próprio site',
+      'Atendente virtual para dúvidas, com saída para o WhatsApp',
+      'Formulário protegido por Cloudflare Turnstile e honeypot',
+      'Dados estruturados Schema.org para busca local',
+    ],
+    metrics: TODO,
+    stack: ['Next.js', 'React', 'Tailwind CSS', 'Vercel'],
+    image: '/cases/iacontabil.webp',
+    imageAlt:
+      'Página inicial do site Iacontábil: título "Contabilidade muito mais inteligente" em fundo claro, cartão com quatro frentes de serviço e mascote ilustrado.',
+    href: 'https://iacontabil.vercel.app/',
+  },
+  {
+    id: 'gmais-arte',
+    name: 'G+ARTE',
+    kind: 'Site institucional',
+    segment: 'Design editorial e comunicação visual',
+    summary:
+      'Site do estúdio de Gabriel Moraes, que faz design editorial e comunicação visual para quem ensina, pesquisa e publica. Cinco grupos de serviço, cada um com o pedido de orçamento já preenchido no WhatsApp.',
+    features: [
+      'Botões de WhatsApp com mensagem pré-preenchida por serviço',
+      'Formulário com consentimento LGPD e Cloudflare Turnstile',
+      'Página de política de privacidade',
+      'Open Graph e metadados completos para compartilhamento',
+    ],
+    metrics: TODO,
+    stack: ['Next.js', 'React', 'CSS Modules', 'Vercel'],
+    image: '/cases/gmais-arte.webp',
+    imageAlt:
+      'Página inicial do site G+ARTE: título "Design editorial e comunicação visual" em branco sobre azul-marinho, com a logo em ciano e feixes de luz.',
+    href: 'https://gmais-arte-black.vercel.app/',
+  },
+]
 
 export const work = {
   heading: 'Projetos',
   lede:
-    'Somos um estúdio novo. Ainda não temos case entregue para mostrar, e não vamos preencher esta página com cliente fictício, logo emprestado ou número inventado.',
+    'Sites entregues e em produção, construídos do zero para clientes reais. Cada card abre o endereço publicado: avalie o resultado no próprio site, não só no print.',
+  status: (count: number) =>
+    count === 1 ? '1 site em produção' : `${count} sites em produção`,
+  linkLabel: 'Abrir o site',
   empty: {
     label: 'cases publicados: 0',
     heading: 'O que vai aparecer aqui',
@@ -171,8 +235,8 @@ export const work = {
     rows: [
       {
         label: 'Primeiro carregamento',
-        value: '251 KB',
-        note: 'comprimidos, dos quais 122 KB são o motor 3D em chunk separado',
+        value: '255 KB',
+        note: 'comprimidos, dos quais 122 KB são o motor 3D em chunk separado; as thumbnails dos cases carregam depois, sob demanda',
       },
       {
         label: 'Acessibilidade',
@@ -186,7 +250,7 @@ export const work = {
       },
       {
         label: 'Animação do dado',
-        value: '40 verificações',
+        value: '48 verificações',
         note: 'a face 20 cai de frente por cálculo de quaternion, com erro de 4,4e-16',
       },
       {
@@ -202,9 +266,9 @@ export const work = {
     ],
   },
   invite: {
-    text: 'Quer ser o primeiro case?',
+    text: 'Quer ser o próximo case?',
     body:
-      'Projeto inaugural tem preço de projeto inaugural, e você entra na conversa sabendo disso. Em troca pedimos autorização para publicar o resultado.',
+      'Todo projeto entra nesta página com autorização do cliente e link para o site publicado. Nada de logo emprestada ou número inventado.',
     action: { label: 'Falar sobre isso', href: '#contato' },
   },
 }

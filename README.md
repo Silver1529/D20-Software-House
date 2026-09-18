@@ -35,7 +35,7 @@ Dev: `vite`, `@vitejs/plugin-react`, `typescript`, `tailwindcss` +
 matemática), `playwright` (roda as checagens de navegador e gera os favicons).
 
 `three` sai em chunk separado (`manualChunks` no `vite.config.ts`), então o resto
-do site não espera por ele: **120 KB gzip** do app + **122 KB gzip** do three.
+do site não espera por ele: **123 KB gzip** do app + **122 KB gzip** do three.
 
 ## A animação do D20
 
@@ -86,16 +86,31 @@ estado, sem three.js, testável isolada.
 
 | Fase | Janela | O que acontece |
 |---|---|---|
-| queda | 0–600 ms | queda livre de `y = 4.68` sob `g = 26`, tombando em dois eixos |
-| impacto | 600 ms | achata 1.20/0.78, clarão horizontal, 26 faíscas, flash |
-| quique | 600–1284 ms | dois saltos, restituição `0.42` e `0.15` |
-| travada | 600–1284 ms | slerp para `q_20` com `easeOutExpo` — o giro decai *para dentro* da travada |
-| brilho | 1284–1664 ms | emissivo da face 20 sobe, arestas acendem, halo floresce |
-| espera | 1664–1814 ms | o 20 fica legível |
-| saída | 1814–2174 ms | o dado cresce e se dissipa, o overlay faz crossfade |
+| queda | 0–880 ms | queda livre de `y = 4.65` sob `g = 12`, girando em **três eixos** (1,4 voltas) |
+| impacto | 880 ms | achata 1.20/0.78, clarão horizontal, 26 faíscas, flash |
+| quique | 880–1848 ms | dois saltos, restituição `0.40` e `0.15` |
+| travada | 880–1848 ms | slerp para `q_20` com `easeOutExpo` — o giro decai *para dentro* da travada |
+| brilho | 1848–2268 ms | emissivo da face 20 sobe, arestas acendem, halo floresce |
+| espera | 2268–2488 ms | o 20 fica legível |
+| saída | 2488–2848 ms | o dado cresce e se dissipa, o overlay faz crossfade |
 
 Altura de queda e alturas de quique não são números escolhidos a dedo: saem de
 `h = ½gt²` e `e²h`. O verificador confere essa relação.
+
+**Por que `g = 12` e não 26.** A queda precisa durar perto de 900 ms para ser
+vista, e o dado precisa estar dentro do quadro no instante da soltura (ponta
+inferior abaixo de 3,4 unidades). Com `g = 26` essas duas condições são
+incompatíveis: ou a queda dura 600 ms, ou o dado entra no quadro atrasado.
+Baixar a gravidade resolve as duas — e como os quiques usam o mesmo `g`, a
+relação `e²h` continua exata.
+
+**A rotação em três eixos.** O dado gira em torno de um eixo principal
+(`SPIN_AXIS`, 10 rad/s) e de dois secundários com razões irracionais em relação
+ao principal: `0.618` (tombo) e `0.43` (rolagem). As três rotações são compostas
+por quaternion a cada quadro. Como as razões não são frações simples, os eixos
+nunca entram em fase — o dado tomba de verdade em 3D em vez de balançar num
+padrão repetido. O verificador confere que nenhuma razão está a menos de
+`1e-3` de `p/q` com `p, q ≤ 6`.
 
 Duas coisas que **não** são óbvias e estão resolvidas no código:
 
@@ -288,35 +303,44 @@ medido.
 
 ### A seção Projetos tem dois estados
 
-`cases` está **vazio** hoje, e a seção assume o estado honesto: diz que o estúdio
-é novo, lista o que cada case vai trazer quando existir, e apresenta este próprio
-site como o material avaliável — com números que foram medidos, não estimados.
+`cases` hoje tem **três sites publicados** (Foco Arte, Iacontábil e G+ARTE). O
+primeiro item da lista vira o card em destaque, de largura inteira; os demais
+entram numa grade de duas colunas. Cada card é um link único para o site
+publicado, em nova aba.
 
-Assim que você adicionar o primeiro objeto ao array `cases`, a seção troca
-sozinha para a grade de cases. Não precisa mexer no componente.
+Se `cases` voltar a ficar vazio, a seção assume o estado honesto: diz que o
+estúdio é novo, lista o que cada case vai trazer e apresenta este próprio site
+como o material avaliável.
 
 ```ts
 export const cases: CaseStudy[] = [
   {
-    id: 'case-01',
-    client: 'Nome do cliente',
-    title: 'O que foi construído',
-    kind: 'Sistema sob medida',
-    problem: 'Onde a operação travava, na linguagem da empresa',
-    outcome: 'O que mudou depois',
-    metrics: [{ label: 'tempo de fechamento', value: '-68%' }],
-    stack: ['TypeScript', 'Node.js', 'PostgreSQL'],
-    image: '/cases/case-01.webp',
-    imageAlt: 'Painel de fechamento mensal do sistema',
-    href: 'https://exemplo.com.br',
+    id: 'foco-arte',
+    name: 'Foco Arte',
+    kind: 'Site institucional',
+    segment: 'Gesso e drywall · São Paulo',
+    summary: 'O que o site faz, em duas frases, sem adjetivo',
+    features: ['Só o que dá para clicar e conferir no site publicado'],
+    metrics: TODO,
+    stack: ['Next.js', 'React', 'Tailwind CSS', 'Vercel'],
+    image: '/cases/foco-arte.webp',
+    imageAlt: 'Descrição da primeira tela do site',
+    href: 'https://foco-arte.vercel.app/',
   },
 ]
 ```
 
-Campos que você não tiver ainda: deixe `TODO` e eles renderizam como **ausência
-visível** (barra hachurada em mono), não como texto falso. Ao apontar `image`
-para um caminho real, o esquema técnico em SVG é substituído pelo screenshot
-automaticamente.
+Regras que valem para os cards de cliente:
+
+- **Só informação verificável no site publicado.** Segmento, o que o site faz,
+  funcionalidades clicáveis e a stack visível no código-fonte da página
+  (`/_next/`, classes do Tailwind, CSS Modules, Turnstile, JSON-LD). Nada de
+  resultado, prazo ou número que o cliente não tenha fornecido.
+- `metrics: TODO` esconde a linha de métricas em vez de inventar um número.
+  Quando houver resultado medido e autorizado, preencha e ele aparece.
+- `image`/`imageAlt` pendentes fazem o card cair no esquema técnico em SVG.
+- Thumbnails são capturas da primeira tela em **1280×800 WebP** (~40 KB cada),
+  em `public/cases/`. Para regerar, capture o site em 1440×900 e reamostre.
 
 ### Os números da seção Projetos
 
@@ -336,7 +360,7 @@ O formulário de contato está ligado e enviando — veja
 ## Verificação
 
 ```bash
-npm run verify          # 40 checagens de geometria e física, sem navegador
+npm run verify          # 48 checagens de geometria e física, sem navegador
 npm run check:browser   # 3 viewports: overflow, alvos de toque, landmarks, alt
 npm run check:states    # teclado, tablist, validação, reduced-motion, skip link
 npm run check:audio     # timing dos sons, janela de 1,5 s, mudo, autoplay bloqueado
@@ -346,7 +370,9 @@ npm run icons           # regera favicons e marcas a partir da logo
 
 `npm run verify` é o que importa se você mexer na animação: ele confere que a
 face 20 continua caindo de frente, que as alturas de quique seguem a física da
-restituição, que o giro nunca inverte e que o dado nunca atravessa o chão.
+restituição, que o giro nunca inverte, que os três eixos de rotação não entram
+em fase, que a queda fica entre 800 e 1000 ms e que o dado nunca atravessa o
+chão.
 
 Contraste foi **calculado**, não estimado. Todo primeiro plano passa WCAG AA
 sobre toda superfície; os números estão em `DESIGN.md`. Botões usam texto escuro
